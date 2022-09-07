@@ -8,6 +8,7 @@ const mongoSanitize = require("express-mongo-sanitize"); // nettoie les données
 require("dotenv").config(); // utilisation des variables d'environnement pour sécuriser les accès
 
 const userRoutes = require("./routes/user.route");
+const postRoutes = require("./routes/post.route");
 
 mongoose
   .connect(process.env.SECRET_DB, {
@@ -42,5 +43,6 @@ app.use(hpp());
 
 app.use("/images", express.static(path.join(__dirname, "images")));
 app.use("/api/auth", userRoutes);
+app.use("/api/posts", postRoutes);
 
 module.exports = app;
