@@ -1,4 +1,5 @@
 import { UserModel } from "../models/user.model.js";
+const User = UserModel.setUserSchema();
 import bcrypt from "bcrypt"; // bibliothèque aidant à hacher les mots de passe
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -6,11 +7,11 @@ dotenv.config(); // utilisation des variables d'environnement pour sécuriser le
 
 export class UserControllers {
   static signup() {
-    (req, res, next) => {
+    return (req, res, next) => {
       bcrypt
         .hash(req.body.password, 10)
         .then((hash) => {
-          const user = new UserModel.setUserSchema()({
+          const user = new User({
             email: req.body.email,
             password: hash,
           });
@@ -24,9 +25,8 @@ export class UserControllers {
   }
 
   static login() {
-    (req, res, next) => {
-      UserModel.setUserSchema()
-        .findOne({ email: req.body.email })
+    return (req, res, next) => {
+      User.findOne({ email: req.body.email })
         .then((user) => {
           if (!user) {
             return res

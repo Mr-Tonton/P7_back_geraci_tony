@@ -1,6 +1,6 @@
 import passwordValidator from "password-validator"; // Valide le mot de passe selon des spécifications flexibles
 
-export class Password {
+export class PasswordModel {
   static setPasswordSchema() {
     const passwordSchema = new passwordValidator();
 

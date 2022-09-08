@@ -4,7 +4,7 @@ dotenv.config(); // utilisation des variables d'environnement pour sécuriser le
 
 export class Auth {
   static setAuth() {
-    (req, res, next) => {
+    return (req, res, next) => {
       try {
         const token = req.headers.authorization.split(" ")[1];
         const decodedToken = jwt.verify(token, process.env.SECRET_TOKEN);

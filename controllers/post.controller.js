@@ -1,39 +1,38 @@
 import { PostModel } from "../models/post.model.js";
+const Post = PostModel.setPostSchema();
 import fs from "fs";
 
 export class PostControllers {
   static getAllPosts() {
-    (req, res, next) => {
-      PostModel.setPostSchema()
-        .find()
+    return (req, res, next) => {
+      Post.find()
         .then((posts) => res.status(200).json(posts))
         .catch((error) => res.status(404).json({ error: error }));
     };
   }
 
   static getOnePost() {
-    (req, res, next) => {
-      PostModel.setPostSchema()
-        .findOne({ _id: req.params.id })
+    return (req, res, next) => {
+      Post.findOne({ _id: req.params.id })
         .then((post) => res.status(200).json(post))
         .catch((error) => res.status(404).json({ error: error }));
     };
   }
 
   static createPost() {
-    // (req, res, next) => {
+    // return (req, res, next) => {
     //   const postObject = req.body;
     //   delete postObject._id;
     //   let post;
     //   if (postObject.imageUrl) {
-    //     post = new PostModel.setPostSchema()({
+    //     post = new Post({
     //       ...postObject,
     //       imageUrl: `${req.protocol}://${req.get("host")}/images/${
     //         req.file.filename
     //       }`,
     //     });
     //   } else {
-    //     post = new PostModel.setPostSchema()({
+    //     post = new Post({
     //       ...postObject,
     //     });
     //   }
@@ -47,8 +46,8 @@ export class PostControllers {
   }
 
   static updatePost() {
-    // (req, res, next) => {
-    //   PostModel.setPostSchema()
+    // return (req, res, next) => {
+    //   Post
     //     .findOne({ _id: req.params.id })
     //     .then((post) => {
     //       let postObject = { ...req.body };
@@ -67,7 +66,7 @@ export class PostControllers {
     //           }
     //         });
     //       }
-    //       PostModel.setPostSchema()
+    //       Post
     //         .updateOne(
     //           { _id: req.params.id },
     //           { ...postObject, _id: req.params.id }
@@ -79,8 +78,8 @@ export class PostControllers {
   }
 
   static deletePost() {
-    // (req, res, next) => {
-    //   PostModel.setPostSchema()
+    // return (req, res, next) => {
+    //   Post
     //     .findOne({ _id: req.params.id })
     //     .then((post) => {
     //       const filename = post.imageUrl.split("/images/")[1];
@@ -90,7 +89,7 @@ export class PostControllers {
     //           console.log(`Deleted file from ./images: ${filename}`);
     //         }
     //       });
-    //       PostModel.setPostSchema()
+    //       Post
     //         .deleteOne({ _id: req.params.id })
     //         .then(() => res.status(200).json({ message: "Post supprimé !" }))
     //         .catch((error) => res.status(400).json({ message: error }));
