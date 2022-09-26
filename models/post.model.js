@@ -6,6 +6,7 @@ export class PostModel {
       {
         userId: { type: String, required: true },
         postContent: { type: String, required: true },
+        imageUrl: { type: String },
       },
       {
         timestamps: true,

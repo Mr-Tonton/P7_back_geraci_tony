@@ -3,22 +3,20 @@ import dotenv from "dotenv";
 dotenv.config(); // utilisation des variables d'environnement pour sécuriser les accès
 
 export class Auth {
-  static setAuth() {
-    return (req, res, next) => {
-      try {
-        const token = req.headers.authorization.split(" ")[1];
-        const decodedToken = jwt.verify(token, process.env.SECRET_TOKEN);
-        const userId = decodedToken.userId;
-        if (req.body.userId && req.body.userId !== userId) {
-          throw "Invalid user ID";
-        } else {
-          next();
-        }
-      } catch (error) {
-        res.status(401).json({
-          error: new Error("Invalid request!"),
-        });
+  static setAuth = (req, res, next) => {
+    try {
+      const token = req.headers.authorization.split(" ")[1];
+      const decodedToken = jwt.verify(token, process.env.SECRET_TOKEN);
+      const userId = decodedToken.userId;
+      if (req.body.userId && req.body.userId !== userId) {
+        throw "ID utilisateur incorrect";
+      } else {
+        next();
       }
-    };
-  }
+    } catch (error) {
+      res.status(401).json({
+        error: new Error("requête invalide"),
+      });
+    }
+  };
 }

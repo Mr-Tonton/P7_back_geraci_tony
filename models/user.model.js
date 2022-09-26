@@ -16,6 +16,17 @@ export class UserModel {
           },
         },
         password: { type: String, required: true },
+        name: {
+          type: String,
+          required: true,
+          validate: {
+            validator: function (v) {
+              return /^[a-zA-Z0-9àâéèëêïîôùüç' -]{1,30}$/.test(v);
+            },
+          },
+        },
+        imageUrl: { type: String, required: true },
+        accountType: { type: String, required: true },
       },
       {
         timestamps: true,

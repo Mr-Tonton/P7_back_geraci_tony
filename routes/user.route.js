@@ -7,10 +7,11 @@ export class UserRoutes {
     const router = express.Router(); // pour créer un nouvel objet routeur
     router.post(
       "/signup",
-      ValidatePassword.testPassword(),
-      UserControllers.signup()
+      ValidatePassword.testPassword,
+      UserControllers.signup
     );
-    router.post("/login", UserControllers.login());
+    router.post("/login", UserControllers.login);
+    router.get("/:user_id", UserControllers.getUser);
 
     return router;
   }

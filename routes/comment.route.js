@@ -5,14 +5,14 @@ import { CommentControllers } from "../controllers/comment.controller.js";
 
 export class CommentRoutes {
   static routes() {
-    const router = express.Router(); // pour créer un nouvel objet routeur
-    router.post("/", Auth.setAuth(), CommentControllers.createComment());
-    router.get(
-      "/:postId",
-      Auth.setAuth(),
-      CommentControllers.getCommentsOfPost()
+    const router = express.Router({ mergeParams: true }); // pour créer un nouvel objet routeur
+    router.post("/", Auth.setAuth, CommentControllers.createComment);
+    router.get("/", Auth.setAuth, CommentControllers.getCommentsOfPost);
+    router.delete(
+      "/:comment_id",
+      Auth.setAuth,
+      CommentControllers.deleteComment
     );
-    router.delete("/:id", Auth.setAuth(), CommentControllers.deleteComment());
     return router;
   }
 }

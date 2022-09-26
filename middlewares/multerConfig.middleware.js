@@ -13,7 +13,7 @@ export class Multer {
     };
   }
 
-  static setMulter() {
+  static setMulter = (req, res, next) => {
     const storage = multer.diskStorage({
       destination: (req, file, callback) => {
         callback(null, "images");
@@ -30,13 +30,14 @@ export class Multer {
       if (extension === "jpg" || extension === "png") {
         callback(null, true);
       } else {
-        callback("Error : Wrong file type", false);
+        callback("Erreur : Mauvais type de fichier", false);
       }
     };
-    return multer({
+
+    multer({
       storage: storage,
       limits: 4000000,
       fileFilter,
     }).single("image"); // limit : 4 Mo.
-  }
+  };
 }

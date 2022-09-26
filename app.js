@@ -55,6 +55,6 @@ export class App {
 
     this.app.use("/api/auth", UserRoutes.routes());
     this.app.use("/api/posts", PostRoutes.routes());
-    this.app.use("/api/comments", CommentRoutes.routes());
+    this.app.use("/api/posts/:postId/comments", CommentRoutes.routes());
   }
 }
