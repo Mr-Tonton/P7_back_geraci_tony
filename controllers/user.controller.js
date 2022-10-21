@@ -4,6 +4,7 @@ import bcrypt from "bcrypt"; // bibliothèque aidant à hacher les mots de passe
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
 dotenv.config(); // utilisation des variables d'environnement pour sécuriser les accès
+import fs from "fs";
 
 export class UserControllers {
   static signup = (req, res, next) => {
@@ -53,6 +54,18 @@ export class UserControllers {
       .catch((error) => res.status(500).json({ error }));
   };
 
+  static verifyToken = (req, res, next) => {
+    try {
+      const token = req.params.user_token;
+      const decodedToken = jwt.verify(token, process.env.SECRET_TOKEN);
+      if (decodedToken) {
+        res.status(200).json("valide");
+      }
+    } catch {
+      res.status(400).json("invalide");
+    }
+  };
+
   static getUser = (req, res, next) => {
     User.findOne({ _id: req.params.user_id })
       .then((user) =>
@@ -65,5 +78,83 @@ export class UserControllers {
         })
       )
       .catch((error) => res.status(404).json({ error: error }));
+  };
+
+  static updateName = (req, res, next) => {
+    User.findOneAndUpdate(
+      { _id: req.params.user_id },
+      {
+        $set: {
+          name: req.body.name,
+        },
+      },
+      {
+        new: true,
+      }
+    )
+      .then((updatedUser) => {
+        res.status(200).json(updatedUser.name);
+      })
+      .catch((error) => res.status(400).json({ error: error }));
+  };
+
+  static updateProfileImage = (req, res, next) => {
+    User.findOne({ _id: req.params.user_id }).then((user) => {
+      const filename = user.imageUrl.split("/images/")[1];
+      if (filename !== "basic_profil.png") {
+        fs.unlink(`images/${filename}`, (err) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log(`fichier effacé du dossier ./images: ${filename}`);
+          }
+        });
+      }
+      User.findOneAndUpdate(
+        { _id: req.params.user_id },
+        {
+          $set: {
+            imageUrl: `${req.protocol}://${req.get("host")}/images/${
+              req.file.filename
+            }`,
+          },
+        },
+        {
+          new: true,
+        }
+      )
+        .then((data) => {
+          return res.status(200).json(data.imageUrl);
+        })
+        .catch((err) => {
+          console.log(err);
+          return res.status(400).json({ err });
+        });
+    });
+  };
+
+  static deleteUser = (req, res, next) => {
+    User.findOne({ _id: req.params.user_id }).then((user) => {
+      const filename = user.imageUrl.split("/images/")[1];
+      let userInfo = user;
+      if (filename !== "basic_profil.png") {
+        fs.unlink(`images/${filename}`, (err) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log(`fichier effacé du dossier ./images: ${filename}`);
+          }
+        });
+      }
+      User.deleteOne({ _id: req.params.user_id })
+        .then(() => {
+          res.status(200).json({
+            message: `Utilisateur ${userInfo.name} ( id: ${userInfo._id}) a été supprimé avec succès !`,
+          });
+        })
+        .catch((error) => {
+          res.status(400).json({ message: error });
+        });
+    });
   };
 }

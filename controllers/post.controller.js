@@ -76,7 +76,7 @@ export class PostControllers {
       .then((post) => {
         if (post.imageUrl) {
           const filename = post.imageUrl.split("/images/")[1];
-          fs.unlink(`images/${filename}`, (err) => {
+          fs.unlink(`images/${filename} `, (err) => {
             if (err) {
               console.log(err);
             } else {
