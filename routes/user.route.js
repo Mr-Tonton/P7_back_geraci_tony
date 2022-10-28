@@ -14,7 +14,6 @@ export class UserRoutes {
     );
     router.post("/login", UserControllers.login);
     router.get("/:user_id", UserControllers.getUser);
-    router.get("/token/:user_token", UserControllers.verifyToken);
     router.put("/name/:user_id", UserControllers.updateName);
     router.put(
       "/profile_image/:user_id",

@@ -13,6 +13,6 @@ export class PostModel {
       }
     );
 
-    return mongoose.model("Post", postSchema);
+    return mongoose.models.Post || mongoose.model("Post", postSchema);
   }
 }

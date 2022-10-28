@@ -15,7 +15,8 @@ export class UserControllers {
           email: req.body.email,
           password: hash,
           name: req.body.name,
-          imageUrl: "http://localhost:3000/images/basic_profil.png",
+          imageUrl:
+            "http://localhost:3000/images/profilePictures/basic_profil.png",
           accountType: "user",
         });
         user
@@ -54,18 +55,6 @@ export class UserControllers {
       .catch((error) => res.status(500).json({ error }));
   };
 
-  static verifyToken = (req, res, next) => {
-    try {
-      const token = req.params.user_token;
-      const decodedToken = jwt.verify(token, process.env.SECRET_TOKEN);
-      if (decodedToken) {
-        res.status(200).json("valide");
-      }
-    } catch {
-      res.status(400).json("invalide");
-    }
-  };
-
   static getUser = (req, res, next) => {
     User.findOne({ _id: req.params.user_id })
       .then((user) =>
@@ -100,13 +89,15 @@ export class UserControllers {
 
   static updateProfileImage = (req, res, next) => {
     User.findOne({ _id: req.params.user_id }).then((user) => {
-      const filename = user.imageUrl.split("/images/")[1];
+      const filename = user.imageUrl.split("/images/profilePictures/")[1];
       if (filename !== "basic_profil.png") {
-        fs.unlink(`images/${filename}`, (err) => {
+        fs.unlink(`images/profilePictures/${filename}`, (err) => {
           if (err) {
             console.log(err);
           } else {
-            console.log(`fichier effacé du dossier ./images: ${filename}`);
+            console.log(
+              `fichier effacé du dossier ./images/profilePictures: ${filename}`
+            );
           }
         });
       }
@@ -114,9 +105,9 @@ export class UserControllers {
         { _id: req.params.user_id },
         {
           $set: {
-            imageUrl: `${req.protocol}://${req.get("host")}/images/${
-              req.file.filename
-            }`,
+            imageUrl: `${req.protocol}://${req.get(
+              "host"
+            )}/images/profilePictures/${req.file.filename}`,
           },
         },
         {
@@ -135,14 +126,16 @@ export class UserControllers {
 
   static deleteUser = (req, res, next) => {
     User.findOne({ _id: req.params.user_id }).then((user) => {
-      const filename = user.imageUrl.split("/images/")[1];
+      const filename = user.imageUrl.split("/images/profilePictures/")[1];
       let userInfo = user;
       if (filename !== "basic_profil.png") {
-        fs.unlink(`images/${filename}`, (err) => {
+        fs.unlink(`images/profilePictures/${filename}`, (err) => {
           if (err) {
             console.log(err);
           } else {
-            console.log(`fichier effacé du dossier ./images: ${filename}`);
+            console.log(
+              `fichier effacé du dossier ./images/profilePictures: ${filename}`
+            );
           }
         });
       }

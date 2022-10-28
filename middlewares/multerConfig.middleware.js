@@ -9,7 +9,12 @@ export class Multer {
     };
     const storage = multer.diskStorage({
       destination: (req, file, callback) => {
-        callback(null, "images");
+        if (req.baseUrl === "/api/auth") {
+          callback(null, "images/profilePictures");
+        }
+        if (req.baseUrl === "/api/posts") {
+          callback(null, "images/postPictures");
+        }
       },
       filename: (req, file, callback) => {
         const name = file.originalname.split(".")[0].split(" ").join("_");
