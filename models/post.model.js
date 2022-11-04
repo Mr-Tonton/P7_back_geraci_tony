@@ -7,6 +7,8 @@ export class PostModel {
         userId: { type: String, required: true },
         postContent: { type: String, required: true },
         imageUrl: { type: String },
+        likes: { type: Number, required: true, default: 0 },
+        usersLiked: { type: [String], required: true, default: [] },
       },
       {
         timestamps: true,

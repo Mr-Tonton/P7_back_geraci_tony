@@ -13,6 +13,6 @@ export class CommentModel {
       }
     );
 
-    return mongoose.model("Comment", commentSchema);
+    return mongoose.models.Comment || mongoose.model("Comment", commentSchema);
   }
 }
