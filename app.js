@@ -10,8 +10,8 @@ import dotenv from "dotenv";
 dotenv.config(); // utilisation des variables d'environnement pour sécuriser les accès
 
 import { UserRoutes } from "./routes/user.route.js";
-import { PostRoutes } from "./routes/post.route.js";
 import { CommentRoutes } from "./routes/comment.route.js";
+import { PostRoutes } from "./routes/post.route.js";
 
 export class App {
   constructor() {
@@ -54,7 +54,7 @@ export class App {
     this.app.use("/images", express.static(path.join(__dirname, "images")));
 
     this.app.use("/api/auth", UserRoutes.routes());
-    this.app.use("/api/posts", PostRoutes.routes());
     this.app.use("/api/posts/:post_id/comments", CommentRoutes.routes());
+    this.app.use("/api/posts", PostRoutes.routes());
   }
 }

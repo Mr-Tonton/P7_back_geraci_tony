@@ -3,25 +3,28 @@ const Post = PostModel.setPostSchema();
 import fs from "fs";
 
 export class PostControllers {
-  static getFewPosts = (req, res, next) => {
-    let collectionLength;
-    Post.find().then((res) => {
-      collectionLength = res.length;
-    });
+  static getPosts = (req, res, next) => {
+    let postCollectionLength;
     Post.find()
-      .sort({ createdAt: -1 })
-      .skip(req.params.skip)
-      .limit(req.params.limit)
-      .then((posts) =>
-        res
-          .status(200)
-          .json({ posts: posts, collectionLength: collectionLength })
-      )
+      .then((res) => {
+        postCollectionLength = res.length;
+      })
+      .then(() => {
+        Post.find()
+          .sort({ createdAt: -1 })
+          .skip(req.params.skip)
+          .limit(req.params.limit)
+          .then((posts) =>
+            res.status(200).json({
+              posts: posts,
+              postCollectionLength: postCollectionLength,
+            })
+          );
+      })
       .catch((error) => res.status(404).json({ error: error }));
   };
 
   static createPost = (req, res, next) => {
-    console.log(req);
     const postObject = JSON.parse(req.body.post);
     let post;
     if (req.file) {
@@ -102,36 +105,7 @@ export class PostControllers {
       .catch((error) => res.status(500).json({ message: error }));
   };
 
-  static deleteAllUserPost = (req, res, next) => {
-    Post.find({ userId: req.params.user_id }).then((posts) => {
-      for (let post of posts) {
-        if (post.imageUrl) {
-          const filename = post.imageUrl.split("/images/postPictures/")[1];
-          fs.unlink(`images/postPictures/${filename}`, (err) => {
-            if (err) {
-              console.log(err);
-            } else {
-              console.log(
-                `fichier effacé depuis ./images/postPictures: ${filename}`
-              );
-            }
-          });
-        }
-      }
-    });
-    Post.deleteMany({ userId: req.params.user_id })
-      .then((posts) => {
-        res.status(200).json({ post: posts });
-      })
-      .catch((err) => {
-        res.status(400).json({ err: err });
-      });
-  };
-
   static likePost = (req, res, next) => {
-    console.log(req.body);
-    console.log(req.body.like);
-    console.log(req.body.userId);
     let like = req.body.like;
     let userId = req.body.userId;
     let postId = req.params.post_id;

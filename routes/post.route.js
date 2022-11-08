@@ -9,7 +9,7 @@ import { PostControllers } from "../controllers/post.controller.js";
 export class PostRoutes {
   static routes() {
     const router = express.Router(); // pour créer un nouvel objet routeur
-    router.get("/:skip/:limit", Auth.setAuth, PostControllers.getFewPosts);
+    router.get("/:skip/:limit", Auth.setAuth, PostControllers.getPosts);
     router.post(
       "/",
       Auth.setAuth,
@@ -29,11 +29,11 @@ export class PostRoutes {
       IsAdminOrCurrentUser.setIsAdminOrCurrentUser,
       PostControllers.deletePost
     );
-    router.delete(
-      "/user_posts/:user_id",
-      Auth.setAuth,
-      PostControllers.deleteAllUserPost
-    );
+    // router.delete(
+    //   "/user_posts/:user_id",
+    //   Auth.setAuth,
+    //   PostControllers.deleteAllUserPost
+    // );
     router.post("/:post_id/like", Auth.setAuth, PostControllers.likePost);
     return router;
   }

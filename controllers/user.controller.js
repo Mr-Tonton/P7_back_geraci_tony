@@ -1,5 +1,9 @@
 import { UserModel } from "../models/user.model.js";
 const User = UserModel.setUserSchema();
+import { PostModel } from "../models/post.model.js";
+const Post = PostModel.setPostSchema();
+import { CommentModel } from "../models/comment.model.js";
+const Comment = CommentModel.setCommentSchema();
 import bcrypt from "bcrypt"; // bibliothèque aidant à hacher les mots de passe
 import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
@@ -134,15 +138,45 @@ export class UserControllers {
             console.log(err);
           } else {
             console.log(
-              `fichier effacé du dossier ./images/profilePictures: ${filename}`
+              `fichier effacé depuis ./images/profilePictures: ${filename}`
             );
           }
         });
       }
       User.deleteOne({ _id: req.params.user_id })
         .then(() => {
-          res.status(200).json({
-            message: `Utilisateur ${userInfo.name} ( id: ${userInfo._id}) a été supprimé avec succès !`,
+          Comment.deleteMany({ userId: req.params.user_id }).then(() => {
+            Post.find({ userId: req.params.user_id }).then((posts) => {
+              for (let post of posts) {
+                if (post.imageUrl) {
+                  const filename = post.imageUrl.split(
+                    "/images/postPictures/"
+                  )[1];
+                  fs.unlink(`images/postPictures/${filename}`, (err) => {
+                    if (err) {
+                      console.log(err);
+                    } else {
+                      console.log(
+                        `fichier effacé depuis ./images/postPictures: ${filename}`
+                      );
+                    }
+                  });
+                }
+              }
+            });
+            Post.deleteMany({ userId: req.params.user_id }).then(() => {
+              Post.updateMany(
+                { usersLiked: req.params.user_id },
+                {
+                  $pull: { usersLiked: req.params.userId },
+                  $inc: { likes: -1 },
+                }
+              ).then(() => {
+                res.status(200).json({
+                  message: `Utilisateur ${userInfo.name} ( id: ${userInfo._id}) a été supprimé avec succès !`,
+                });
+              });
+            });
           });
         })
         .catch((error) => {
