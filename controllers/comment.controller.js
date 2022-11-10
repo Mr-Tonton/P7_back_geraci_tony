@@ -1,4 +1,3 @@
-import { cp } from "fs";
 import { CommentModel } from "../models/comment.model.js";
 const Comment = CommentModel.setCommentSchema();
 

@@ -1,5 +1,7 @@
 import { PostModel } from "../models/post.model.js";
 const Post = PostModel.setPostSchema();
+import { CommentModel } from "../models/comment.model.js";
+const Comment = CommentModel.setCommentSchema();
 import fs from "fs";
 
 export class PostControllers {
@@ -49,35 +51,45 @@ export class PostControllers {
 
   static updatePost = (req, res, next) => {
     Post.findOne({ _id: req.params.post_id }).then((post) => {
-      let postObject = { ...req.body };
+      let postObject = JSON.parse(req.body.updatePost);
+
+      if ((req.file && post.imageUrl) || (!req.file && post.imageUrl)) {
+        const filename = post.imageUrl.split("/images/postPictures/")[1];
+        fs.unlink(`images/postPictures/${filename}`, (err) => {
+          if (err) {
+            console.log(err);
+          } else {
+            console.log(
+              `fichier effacé depuis ./images/postPictures: ${filename}`
+            );
+          }
+        });
+      }
       if (req.file) {
-        if (post.imageUrl) {
-          const filename = post.imageUrl.split("/images/postPictures/")[1];
-          fs.unlink(`images/postPictures/${filename}`, (err) => {
-            if (err) {
-              console.log(err);
-            } else {
-              console.log(
-                `fichier effacé depuis ./images/postPictures: ${filename}`
-              );
-            }
-          });
-        }
         postObject = {
-          ...JSON.parse(req.body.post),
+          ...JSON.parse(req.body.updatePost),
           imageUrl: `${req.protocol}://${req.get("host")}/images/postPictures/${
             req.file.filename
           }`,
         };
       }
-      Post.updateOne(
-        { _id: req.params.post_id },
-        { ...postObject, _id: req.params.post_id }
-      )
-        .then(() =>
-          res.status(200).json({ message: "Post modifié avec succès!" })
+      if (!req.file && post.imageUrl) {
+        Post.updateOne(
+          { _id: req.params.post_id },
+          { $unset: { imageUrl: "" } },
+          { ...postObject }
         )
-        .catch((error) => res.status(400).json({ error }));
+          .then(() =>
+            res.status(200).json({ message: "Post modifié avec succès!" })
+          )
+          .catch((error) => res.status(400).json({ error }));
+      } else {
+        Post.updateOne({ _id: req.params.post_id }, { ...postObject })
+          .then(() =>
+            res.status(200).json({ message: "Post modifié avec succès!" })
+          )
+          .catch((error) => res.status(400).json({ error }));
+      }
     });
   };
 
@@ -96,11 +108,13 @@ export class PostControllers {
             }
           });
         }
-        Post.deleteOne({ _id: req.params.post_id })
-          .then(() =>
-            res.status(200).json({ message: "Post supprimé avec succès !" })
-          )
-          .catch((error) => res.status(400).json({ message: error }));
+        Comment.deleteMany({ post_id: req.params.post_id }).then(() => {
+          Post.deleteOne({ _id: req.params.post_id })
+            .then(() =>
+              res.status(200).json({ message: "Post supprimé avec succès !" })
+            )
+            .catch((error) => res.status(400).json({ message: error }));
+        });
       })
       .catch((error) => res.status(500).json({ message: error }));
   };

@@ -29,11 +29,6 @@ export class PostRoutes {
       IsAdminOrCurrentUser.setIsAdminOrCurrentUser,
       PostControllers.deletePost
     );
-    // router.delete(
-    //   "/user_posts/:user_id",
-    //   Auth.setAuth,
-    //   PostControllers.deleteAllUserPost
-    // );
     router.post("/:post_id/like", Auth.setAuth, PostControllers.likePost);
     return router;
   }
