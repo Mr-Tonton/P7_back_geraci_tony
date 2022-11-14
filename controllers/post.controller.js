@@ -1,8 +1,9 @@
-import { PostModel } from "../models/post.model.js";
-const Post = PostModel.setPostSchema();
-import { CommentModel } from "../models/comment.model.js";
-const Comment = CommentModel.setCommentSchema();
 import fs from "fs";
+
+import { PostModel } from "../models/post.model.js";
+import { CommentModel } from "../models/comment.model.js";
+const Post = PostModel.setPostSchema();
+const Comment = CommentModel.setCommentSchema();
 
 export class PostControllers {
   static getPosts = (req, res, next) => {
@@ -43,7 +44,7 @@ export class PostControllers {
     }
     post
       .save()
-      .then(() =>
+      .then((result) =>
         res.status(201).json({ message: "Post sauvegardé avec succès !" })
       )
       .catch((error) => res.status(400).json({ error: error }));
@@ -53,7 +54,7 @@ export class PostControllers {
     Post.findOne({ _id: req.params.post_id }).then((post) => {
       let postObject = JSON.parse(req.body.updatePost);
 
-      if ((req.file && post.imageUrl) || (!req.file && post.imageUrl)) {
+      if ((req.file && post.imageUrl) || postObject.deletedImage) {
         const filename = post.imageUrl.split("/images/postPictures/")[1];
         fs.unlink(`images/postPictures/${filename}`, (err) => {
           if (err) {
@@ -73,7 +74,9 @@ export class PostControllers {
           }`,
         };
       }
-      if (!req.file && post.imageUrl) {
+      if (postObject.deletedImage) {
+        delete postObject.deletedImage;
+
         Post.updateOne(
           { _id: req.params.post_id },
           { $unset: { imageUrl: "" } },

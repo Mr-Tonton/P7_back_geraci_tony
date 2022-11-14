@@ -1,14 +1,15 @@
-import { UserModel } from "../models/user.model.js";
-const User = UserModel.setUserSchema();
-import { PostModel } from "../models/post.model.js";
-const Post = PostModel.setPostSchema();
-import { CommentModel } from "../models/comment.model.js";
-const Comment = CommentModel.setCommentSchema();
 import bcrypt from "bcrypt"; // bibliothèque aidant à hacher les mots de passe
 import jwt from "jsonwebtoken";
+import fs from "fs";
 import dotenv from "dotenv";
 dotenv.config(); // utilisation des variables d'environnement pour sécuriser les accès
-import fs from "fs";
+
+import { UserModel } from "../models/user.model.js";
+import { PostModel } from "../models/post.model.js";
+import { CommentModel } from "../models/comment.model.js";
+const User = UserModel.setUserSchema();
+const Post = PostModel.setPostSchema();
+const Comment = CommentModel.setCommentSchema();
 
 export class UserControllers {
   static signup = (req, res, next) => {
@@ -20,7 +21,7 @@ export class UserControllers {
           password: hash,
           name: req.body.name,
           imageUrl:
-            "http://localhost:3000/images/profilePictures/basic_profil.png",
+            "http://localhost:3000/images/profilePictures/basic_profile.png",
           accountType: "user",
         });
         user
@@ -94,7 +95,7 @@ export class UserControllers {
   static updateProfileImage = (req, res, next) => {
     User.findOne({ _id: req.params.user_id }).then((user) => {
       const filename = user.imageUrl.split("/images/profilePictures/")[1];
-      if (filename !== "basic_profil.png") {
+      if (filename !== "basic_profile.png") {
         fs.unlink(`images/profilePictures/${filename}`, (err) => {
           if (err) {
             console.log(err);
@@ -132,7 +133,7 @@ export class UserControllers {
     User.findOne({ _id: req.params.user_id }).then((user) => {
       const filename = user.imageUrl.split("/images/profilePictures/")[1];
       let userInfo = user;
-      if (filename !== "basic_profil.png") {
+      if (filename !== "basic_profile.png") {
         fs.unlink(`images/profilePictures/${filename}`, (err) => {
           if (err) {
             console.log(err);

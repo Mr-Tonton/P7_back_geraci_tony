@@ -1,8 +1,9 @@
 import express from "express";
 import { ValidatePassword } from "../middlewares/validatePassword.middleware.js";
-import { UserControllers } from "../controllers/user.controller.js";
 import { Multer } from "../middlewares/multerConfig.middleware.js";
 import { Auth } from "../middlewares/auth.middleware.js";
+
+import { UserControllers } from "../controllers/user.controller.js";
 
 export class UserRoutes {
   static routes() {
@@ -12,16 +13,17 @@ export class UserRoutes {
       ValidatePassword.testPassword,
       UserControllers.signup
     );
-    router.post("/login", UserControllers.login);
-    router.get("/:user_id", UserControllers.getUser);
-    router.put("/name/:user_id", UserControllers.updateName);
+    router.post("/login", UserControllers.login); // log de l'utilisateur
+
+    router.get("/:user_id", Auth.setAuth, UserControllers.getUser); // récupérer les infos d'un utilisateur.
+    router.put("/name/:user_id", Auth.setAuth, UserControllers.updateName); // modifier le nom d'utilisateur
     router.put(
       "/profile_image/:user_id",
       Auth.setAuth,
       Multer.setMulter(),
       UserControllers.updateProfileImage
-    );
-    router.delete("/:user_id", Auth.setAuth, UserControllers.deleteUser);
+    ); // modifier l'image de profil utilisateur
+    router.delete("/:user_id", Auth.setAuth, UserControllers.deleteUser); // supprimer un utilisateur, ses posts, comments, likes...
 
     return router;
   }
