@@ -51,9 +51,9 @@ export class PostControllers {
   };
 
   static updatePost = (req, res, next) => {
+    let postObject = { ...JSON.parse(req.body.updatePost) };
+    console.log(postObject);
     Post.findOne({ _id: req.params.post_id }).then((post) => {
-      let postObject = JSON.parse(req.body.updatePost);
-
       if ((req.file && post.imageUrl) || postObject.deletedImage) {
         const filename = post.imageUrl.split("/images/postPictures/")[1];
         fs.unlink(`images/postPictures/${filename}`, (err) => {
@@ -67,23 +67,28 @@ export class PostControllers {
         });
       }
       if (req.file) {
+        delete postObject.deletedImage;
         postObject = {
           ...JSON.parse(req.body.updatePost),
           imageUrl: `${req.protocol}://${req.get("host")}/images/postPictures/${
             req.file.filename
           }`,
         };
+        console.log(postObject);
       }
+
       if (postObject.deletedImage) {
         delete postObject.deletedImage;
+        console.log(postObject);
 
-        Post.updateOne(
-          { _id: req.params.post_id },
-          { $unset: { imageUrl: "" } },
-          { ...postObject }
-        )
+        Post.updateOne({ _id: req.params.post_id }, { ...postObject })
           .then(() =>
-            res.status(200).json({ message: "Post modifié avec succès!" })
+            Post.updateOne(
+              { _id: req.params.post_id },
+              { $unset: { imageUrl: "" } }
+            ).then(() => {
+              res.status(200).json({ message: "Post modifié avec succès!" });
+            })
           )
           .catch((error) => res.status(400).json({ error }));
       } else {
@@ -111,7 +116,7 @@ export class PostControllers {
             }
           });
         }
-        Comment.deleteMany({ post_id: req.params.post_id }).then(() => {
+        Comment.deleteMany({ postId: req.params.post_id }).then(() => {
           Post.deleteOne({ _id: req.params.post_id })
             .then(() =>
               res.status(200).json({ message: "Post supprimé avec succès !" })
